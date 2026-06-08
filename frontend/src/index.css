@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #05071c 0%, #0c1035 40%, #1b2359 100%);
+  background-attachment: fixed;
+  color: white;
+  font-family: "Poppins", sans-serif;
+  margin: 0;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Custom interactive hover class for glassmorphic elements */
+.glass-interactive {
+  transition: transform 0.3s ease, border-color 0.3s ease !important;
+}
+
+.glass-interactive:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
