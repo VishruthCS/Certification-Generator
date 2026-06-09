@@ -12,3 +12,4 @@ cloudinary
 google-auth
 requests
 email-validator
+email-validator

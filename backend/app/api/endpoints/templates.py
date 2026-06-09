@@ -11,6 +11,8 @@ from app.schemas.template import TemplateResponse, PlaceholderConfigCreate, Gene
 from app.services.ai import detect_placeholders
 from app.services.generation import generate_certificate
 from fastapi.responses import StreamingResponse
+from app.api.deps import get_current_user
+from app.models.user import User
 
 router = APIRouter()
 
@@ -20,7 +22,8 @@ import cloudinary.uploader
 @router.post("/upload", response_model=TemplateResponse)
 def upload_template(
     file: UploadFile = File(...),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ) -> Any:
     # Validate file format
     allowed_extensions = ["png", "jpg", "jpeg"]
@@ -43,7 +46,8 @@ def upload_template(
     db_template = Template(
         template_name=template_name,
         image_path=file_url,
-        thumbnail_path=file_url # Using original as thumbnail for now
+        thumbnail_path=file_url, # Using original as thumbnail for now
+        user_id=current_user.id
     )
     db.add(db_template)
     db.commit()
@@ -52,20 +56,20 @@ def upload_template(
     return db_template
 
 @router.get("/", response_model=List[TemplateResponse])
-def get_templates(db: Session = Depends(get_db)) -> Any:
-    templates = db.query(Template).all()
+def get_templates(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)) -> Any:
+    templates = db.query(Template).filter(Template.user_id == current_user.id).all()
     return templates
 
 @router.get("/{template_id}", response_model=TemplateResponse)
-def get_template(template_id: int, db: Session = Depends(get_db)) -> Any:
-    template = db.query(Template).filter(Template.id == template_id).first()
+def get_template(template_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)) -> Any:
+    template = db.query(Template).filter(Template.id == template_id, Template.user_id == current_user.id).first()
     if not template:
         raise HTTPException(status_code=404, detail="Template not found")
     return template
 
 @router.put("/{template_id}/rename", response_model=TemplateResponse)
-def rename_template(template_id: int, request: TemplateRename, db: Session = Depends(get_db)) -> Any:
-    template = db.query(Template).filter(Template.id == template_id).first()
+def rename_template(template_id: int, request: TemplateRename, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)) -> Any:
+    template = db.query(Template).filter(Template.id == template_id, Template.user_id == current_user.id).first()
     if not template:
         raise HTTPException(status_code=404, detail="Template not found")
     
@@ -75,8 +79,8 @@ def rename_template(template_id: int, request: TemplateRename, db: Session = Dep
     return template
 
 @router.delete("/{template_id}")
-def delete_template(template_id: int, db: Session = Depends(get_db)) -> Any:
-    template = db.query(Template).filter(Template.id == template_id).first()
+def delete_template(template_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)) -> Any:
+    template = db.query(Template).filter(Template.id == template_id, Template.user_id == current_user.id).first()
     if not template:
         raise HTTPException(status_code=404, detail="Template not found")
     
@@ -100,8 +104,8 @@ def delete_template(template_id: int, db: Session = Depends(get_db)) -> Any:
     return {"message": "Template deleted successfully"}
 
 @router.post("/{template_id}/analyze")
-def analyze_template(template_id: int, db: Session = Depends(get_db)) -> Any:
-    template = db.query(Template).filter(Template.id == template_id).first()
+def analyze_template(template_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)) -> Any:
+    template = db.query(Template).filter(Template.id == template_id, Template.user_id == current_user.id).first()
     if not template:
         raise HTTPException(status_code=404, detail="Template not found")
     
@@ -110,8 +114,8 @@ def analyze_template(template_id: int, db: Session = Depends(get_db)) -> Any:
     return coordinates
 
 @router.post("/{template_id}/placeholders")
-def save_placeholders(template_id: int, configs: List[PlaceholderConfigCreate], db: Session = Depends(get_db)) -> Any:
-    template = db.query(Template).filter(Template.id == template_id).first()
+def save_placeholders(template_id: int, configs: List[PlaceholderConfigCreate], db: Session = Depends(get_db), current_user: User = Depends(get_current_user)) -> Any:
+    template = db.query(Template).filter(Template.id == template_id, Template.user_id == current_user.id).first()
     if not template:
         raise HTTPException(status_code=404, detail="Template not found")
         
@@ -133,16 +137,16 @@ def save_placeholders(template_id: int, configs: List[PlaceholderConfigCreate], 
     return {"message": "Configuration saved"}
 
 @router.get("/{template_id}/placeholders", response_model=List[PlaceholderConfigResponse])
-def get_placeholders(template_id: int, db: Session = Depends(get_db)):
-    template = db.query(Template).filter(Template.id == template_id).first()
+def get_placeholders(template_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    template = db.query(Template).filter(Template.id == template_id, Template.user_id == current_user.id).first()
     if not template:
         raise HTTPException(status_code=404, detail="Template not found")
         
     configs = db.query(PlaceholderConfig).filter(PlaceholderConfig.template_id == template_id).all()
     return configs
 @router.post("/{template_id}/generate")
-def generate_cert(template_id: int, request: GenerateCertificateRequest, db: Session = Depends(get_db)):
-    template = db.query(Template).filter(Template.id == template_id).first()
+def generate_cert(template_id: int, request: GenerateCertificateRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    template = db.query(Template).filter(Template.id == template_id, Template.user_id == current_user.id).first()
     if not template:
         raise HTTPException(status_code=404, detail="Template not found")
         

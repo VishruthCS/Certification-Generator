@@ -43,6 +43,12 @@ class Settings(BaseSettings):
 
     # Cloudinary Integration
     CLOUDINARY_URL: str = os.getenv("CLOUDINARY_URL", "")
+    
+    # SMTP Config
+    SMTP_SERVER: str = "smtp.gmail.com"
+    SMTP_PORT: int = 587
+    SMTP_USERNAME: str = ""
+    SMTP_PASSWORD: str = ""
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

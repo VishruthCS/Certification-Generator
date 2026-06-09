@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Container, TextField, Button, Typography, Box, Paper, Alert, Grid, List, ListItem, ListItemIcon, ListItemText, Divider } from "@mui/material";
+import { Container, TextField, Button, Typography, Box, Paper, Alert, Grid, List, ListItem, ListItemIcon, ListItemText, Divider, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 import { AutoAwesome, Speed, Security } from "@mui/icons-material";
 import { GoogleLogin } from '@react-oauth/google';
 import api from "../services/api";
@@ -9,7 +9,17 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const navigate = useNavigate();
+
+  // Forgot password dialog states
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [resetOpen, setResetOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [resetToken, setResetToken] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [dialogError, setDialogError] = useState("");
+  const [dialogSuccess, setDialogSuccess] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -55,6 +65,36 @@ const Login = () => {
 
   const handleGoogleError = () => {
     setError("Google authentication was cancelled or failed.");
+  };
+
+  const handleForgotPassword = async () => {
+    setDialogError("");
+    setDialogSuccess("");
+    try {
+      await api.post("/auth/forgot-password", { email: forgotEmail });
+      setDialogSuccess("If an account exists, a reset token has been sent to that email.");
+    } catch (err) {
+      setDialogError("Failed to request password reset.");
+    }
+  };
+
+  const handleResetPassword = async () => {
+    setDialogError("");
+    setDialogSuccess("");
+    try {
+      await api.post("/auth/reset-password", { 
+        token: resetToken, 
+        new_password: newPassword 
+      });
+      setDialogSuccess("Password successfully reset! You can now log in.");
+      setTimeout(() => {
+        setResetOpen(false);
+        setDialogSuccess("");
+        setPassword(""); // clear old password field
+      }, 2000);
+    } catch (err) {
+      setDialogError(err.response?.data?.detail || "Failed to reset password. Token may be invalid.");
+    }
   };
 
   return (
@@ -154,8 +194,35 @@ const Login = () => {
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                helperText="Must be 8+ chars with uppercase, lowercase, number & special char."
               />
-              <Button type="submit" fullWidth variant="contained" size="large" sx={{ mt: 5, mb: 2, py: 1.8, borderRadius: 2, fontWeight: 700, fontSize: '1.1rem', background: 'linear-gradient(45deg, #1976d2 0%, #9c27b0 100%)', textTransform: 'none' }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
+                <Button 
+                  variant="text" 
+                  size="small" 
+                  onClick={() => {
+                    setForgotOpen(true);
+                    setDialogSuccess("");
+                    setDialogError("");
+                  }}
+                  sx={{ textTransform: 'none', color: '#90caf9' }}
+                >
+                  Forgot Password?
+                </Button>
+                <Button 
+                  variant="text" 
+                  size="small" 
+                  onClick={() => {
+                    setResetOpen(true);
+                    setDialogSuccess("");
+                    setDialogError("");
+                  }}
+                  sx={{ textTransform: 'none', color: '#ce93d8' }}
+                >
+                  I have a Reset Token
+                </Button>
+              </Box>
+              <Button type="submit" fullWidth variant="contained" size="large" sx={{ mt: 4, mb: 2, py: 1.8, borderRadius: 2, fontWeight: 700, fontSize: '1.1rem', background: 'linear-gradient(45deg, #1976d2 0%, #9c27b0 100%)', textTransform: 'none' }}>
                 Authenticate
               </Button>
             </Box>
@@ -163,6 +230,69 @@ const Login = () => {
         </Grid>
         
       </Grid>
+
+      {/* Forgot Password Dialog */}
+      <Dialog open={forgotOpen} onClose={() => setForgotOpen(false)} PaperProps={{ sx: { bgcolor: '#1e1e2d', color: 'white' } }}>
+        <DialogTitle>Reset Password</DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ color: 'rgba(255,255,255,0.7)', mb: 2 }}>
+            Enter your email address and we'll send you a secure reset token.
+          </DialogContentText>
+          {dialogError && <Alert severity="error" sx={{ mb: 2 }}>{dialogError}</Alert>}
+          {dialogSuccess && <Alert severity="success" sx={{ mb: 2 }}>{dialogSuccess}</Alert>}
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Email Address"
+            type="email"
+            fullWidth
+            variant="outlined"
+            value={forgotEmail}
+            onChange={(e) => setForgotEmail(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions sx={{ p: 3 }}>
+          <Button onClick={() => setForgotOpen(false)} sx={{ color: 'rgba(255,255,255,0.7)' }}>Cancel</Button>
+          <Button onClick={handleForgotPassword} variant="contained" sx={{ bgcolor: '#1976d2' }}>Send Reset Token</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Enter Reset Token Dialog */}
+      <Dialog open={resetOpen} onClose={() => setResetOpen(false)} PaperProps={{ sx: { bgcolor: '#1e1e2d', color: 'white' } }}>
+        <DialogTitle>Enter Reset Token</DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ color: 'rgba(255,255,255,0.7)', mb: 2 }}>
+            Check your email for the reset token, and enter your new password.
+          </DialogContentText>
+          {dialogError && <Alert severity="error" sx={{ mb: 2 }}>{dialogError}</Alert>}
+          {dialogSuccess && <Alert severity="success" sx={{ mb: 2 }}>{dialogSuccess}</Alert>}
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Reset Token"
+            fullWidth
+            variant="outlined"
+            value={resetToken}
+            onChange={(e) => setResetToken(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            margin="dense"
+            label="New Password"
+            type="password"
+            fullWidth
+            variant="outlined"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            helperText="8+ chars, uppercase, lowercase, number & special char"
+          />
+        </DialogContent>
+        <DialogActions sx={{ p: 3 }}>
+          <Button onClick={() => setResetOpen(false)} sx={{ color: 'rgba(255,255,255,0.7)' }}>Cancel</Button>
+          <Button onClick={handleResetPassword} variant="contained" sx={{ bgcolor: '#9c27b0' }}>Reset Password</Button>
+        </DialogActions>
+      </Dialog>
+
     </Container>
   );
 };
