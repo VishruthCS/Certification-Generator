@@ -19,11 +19,16 @@ class Settings(BaseSettings):
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
         import urllib.parse
-        # Use pymysql
         if self.MYSQL_PASSWORD:
             encoded_password = urllib.parse.quote_plus(self.MYSQL_PASSWORD)
-            return f"mysql+pymysql://{self.MYSQL_USER}:{encoded_password}@{self.MYSQL_SERVER}:{self.MYSQL_PORT}/{self.MYSQL_DB}"
-        return f"mysql+pymysql://{self.MYSQL_USER}@{self.MYSQL_SERVER}:{self.MYSQL_PORT}/{self.MYSQL_DB}"
+            base_uri = f"mysql+pymysql://{self.MYSQL_USER}:{encoded_password}@{self.MYSQL_SERVER}:{self.MYSQL_PORT}/{self.MYSQL_DB}"
+        else:
+            base_uri = f"mysql+pymysql://{self.MYSQL_USER}@{self.MYSQL_SERVER}:{self.MYSQL_PORT}/{self.MYSQL_DB}"
+        
+        # Aiven specifically requires SSL mode
+        if "aivencloud" in self.MYSQL_SERVER:
+            return f"{base_uri}?ssl_disabled=False"
+        return base_uri
     
     # Upload paths
     UPLOAD_DIR: str = os.path.join(os.getcwd(), "uploads")

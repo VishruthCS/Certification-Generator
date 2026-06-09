@@ -11,6 +11,11 @@ app = FastAPI(
 )
 
 # Set all CORS enabled origins
+from app.core.database import Base, engine
+from app.models.user import User
+from app.models.template import Template, PlaceholderConfig
+Base.metadata.create_all(bind=engine)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], # Allow all origins for production
