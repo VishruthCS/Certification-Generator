@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
 import Login from "./pages/Login";
 import Gallery from "./pages/Gallery";
@@ -63,6 +63,14 @@ const darkGlassTheme = createTheme({
   },
 });
 
+const ProtectedRoute = () => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return <Outlet />;
+};
+
 function App() {
   return (
     <ThemeProvider theme={darkGlassTheme}>
@@ -71,11 +79,13 @@ function App() {
         <Route path="/login" element={<Login />} />
         
         {/* Protected layout with Sidebar */}
-        <Route element={<SidebarLayout />}>
-          <Route path="/" element={<Gallery />} />
-          <Route path="/upload" element={<Upload />} />
-          <Route path="/configure/:id" element={<Configure />} />
-          <Route path="/generate/:id" element={<Generate />} />
+        <Route element={<ProtectedRoute />}>
+          <Route element={<SidebarLayout />}>
+            <Route path="/" element={<Gallery />} />
+            <Route path="/upload" element={<Upload />} />
+            <Route path="/configure/:id" element={<Configure />} />
+            <Route path="/generate/:id" element={<Generate />} />
+          </Route>
         </Route>
       </Routes>
     </ThemeProvider>
