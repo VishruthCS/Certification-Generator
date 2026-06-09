@@ -162,7 +162,6 @@ const Login = () => {
                 shape="rectangular"
                 size="large"
                 text="continue_with"
-                width={400}
               />
             </Box>
 
