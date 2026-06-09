@@ -16,29 +16,36 @@ router = APIRouter()
 
 @router.post("/register", response_model=UserResponse)
 def register(user_in: UserCreate, db: Session = Depends(get_db)) -> Any:
-    user = db.query(User).filter(User.email == user_in.email).first()
-    if user:
-        raise HTTPException(
-            status_code=400,
-            detail="The user with this email already exists in the system.",
+    try:
+        user = db.query(User).filter(User.email == user_in.email).first()
+        if user:
+            raise HTTPException(
+                status_code=400,
+                detail="The user with this email already exists in the system.",
+            )
+        user_db = db.query(User).filter(User.username == user_in.username).first()
+        if user_db:
+             raise HTTPException(
+                status_code=400,
+                detail="The user with this username already exists in the system.",
+            )
+        
+        hashed_password = security.get_password_hash(user_in.password)
+        new_user = User(
+            email=user_in.email,
+            username=user_in.username,
+            password_hash=hashed_password,
         )
-    user_db = db.query(User).filter(User.username == user_in.username).first()
-    if user_db:
-         raise HTTPException(
-            status_code=400,
-            detail="The user with this username already exists in the system.",
-        )
-    
-    hashed_password = security.get_password_hash(user_in.password)
-    new_user = User(
-        email=user_in.email,
-        username=user_in.username,
-        password_hash=hashed_password,
-    )
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    return new_user
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+        return new_user
+    except HTTPException:
+        raise
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=400, detail=f"Registration crash: {str(e)}")
 
 @router.post("/login", response_model=Token)
 def login(user_in: UserCreate, db: Session = Depends(get_db)) -> Any:

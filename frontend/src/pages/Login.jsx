@@ -36,7 +36,8 @@ const Login = () => {
         localStorage.setItem("token", loginResponse.data.access_token);
         navigate("/");
       } catch (regErr) {
-          setError("Invalid credentials and auto-register failed.");
+          const detail = regErr.response?.data?.detail || "Invalid credentials and auto-register failed.";
+          setError(detail);
       }
     }
   };
