@@ -211,7 +211,7 @@ const Generate = () => {
         <Grid item xs={12} md={8}>
           <Paper elevation={3} sx={{ p: 4, display: "flex", flexDirection: "column", alignItems: "center", bgcolor: "rgba(0,0,0,0.1)" }}>
             <Typography variant="h6" gutterBottom>Live Preview</Typography>
-            <Box sx={{ border: "1px solid rgba(255,255,255,0.1)", overflow: "hidden", mt: 2, borderRadius: 2 }}>
+            <Box sx={{ border: "1px solid rgba(255,255,255,0.1)", overflow: "auto", mt: 2, borderRadius: 2, maxWidth: "100%" }}>
               <Stage width={imageSize.width * scale} height={imageSize.height * scale} scaleX={scale} scaleY={scale}>
                 <Layer>
                   <TemplateImage 
