@@ -27,8 +27,16 @@ const Configure = () => {
   const [error, setError] = useState("");
   const [fontColor, setFontColor] = useState("#000000");
   
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const [imageSize, setImageSize] = useState({ width: 800, height: 600 });
-  const baseScale = Math.min(800 / imageSize.width, 600 / imageSize.height);
+  const containerWidth = Math.min(windowWidth - 48, 800);
+  const baseScale = Math.min(containerWidth / Math.max(imageSize.width, 1), 600 / Math.max(imageSize.height, 1));
   const [zoomLevel, setZoomLevel] = useState(1);
   const scale = baseScale * zoomLevel;
   
