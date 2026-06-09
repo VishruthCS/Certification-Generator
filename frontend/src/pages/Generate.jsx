@@ -226,7 +226,7 @@ const Generate = () => {
                       x={field.x_coordinate}
                       y={field.y_coordinate}
                       fontSize={field.font_size}
-                      fontFamily={field.font_family || "Arial"}
+                      fontFamily={field.font_family || "Open Sans"}
                       fill={field.font_color || "black"}
                       opacity={formData[field.field_name] ? 1 : 0.5}
                     />

@@ -154,7 +154,7 @@ const Configure = () => {
         x_coordinate: config.x,
         y_coordinate: config.y,
         font_size: config.fontSize,
-        font_family: "Arial",
+        font_family: "Open Sans",
         font_color: fontColor
       }));
       await api.post(`/templates/${id}/placeholders`, payload);
@@ -229,7 +229,7 @@ const Configure = () => {
                   x={config.x}
                   y={config.y}
                   fontSize={config.fontSize}
-                  fontFamily="Arial"
+                  fontFamily="Open Sans"
                   fill={fontColor}
                   draggable
                   onClick={() => setSelectedId(key)}
