@@ -9,7 +9,13 @@ def generate_certificate(template: Template, configs: list[PlaceholderConfig], d
     Returns the generated file as a BytesIO object.
     """
     try:
-        img = Image.open(template.image_path).convert("RGBA")
+        import requests
+        if template.image_path.startswith("http://") or template.image_path.startswith("https://"):
+            response = requests.get(template.image_path)
+            response.raise_for_status()
+            img = Image.open(BytesIO(response.content)).convert("RGBA")
+        else:
+            img = Image.open(template.image_path).convert("RGBA")
     except Exception as e:
         raise ValueError(f"Could not open template image: {e}")
 

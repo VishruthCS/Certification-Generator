@@ -127,8 +127,8 @@ const Generate = () => {
 
   if (loading) return <Container sx={{ mt: 4 }}><CircularProgress /></Container>;
   
-  const filename = template?.image_path.split("\\").pop().split("/").pop();
-  const imageUrl = `http://localhost:8000/uploads/templates/${filename}`;
+  const filename = template?.image_path ? template.image_path.split("\\\\").pop().split("/").pop() : "";
+  const imageUrl = template?.image_path?.startsWith("http") ? template.image_path : `http://localhost:8000/uploads/templates/${filename}`;
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4 }}>
