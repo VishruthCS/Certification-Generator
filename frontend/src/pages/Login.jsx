@@ -62,7 +62,7 @@ const Login = () => {
       <Grid container spacing={8} alignItems="center">
         
         {/* Left Information Section */}
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid size={{ xs: 12, md: 6 }} sx={{ display: { xs: 'none', md: 'block' } }}>
           <Typography variant="h2" sx={{ fontWeight: 900, mb: 2, background: 'linear-gradient(45deg, #64b5f6 30%, #ce93d8 90%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
             Certify AI
           </Typography>
