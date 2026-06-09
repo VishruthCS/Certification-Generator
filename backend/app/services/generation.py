@@ -42,14 +42,13 @@ def generate_certificate(template: Template, configs: list[PlaceholderConfig], d
                 # Fallback to default
                 font = ImageFont.load_default()
 
-            # Konva frontend places text from the top-left corner by default.
-            # Using anchor="lt" (left, top) ensures the text is drawn exactly where the user dragged it.
+            # Using anchor="mt" (middle, top) ensures text stays centered over the line.
             draw.text(
                 (config.x_coordinate, config.y_coordinate), 
                 field_value, 
                 fill=config.font_color, 
                 font=font,
-                anchor="lt" 
+                anchor="mt" 
             )
 
     output = BytesIO()

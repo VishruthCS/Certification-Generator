@@ -33,6 +33,18 @@ const Generate = () => {
   // Form state
   const [formData, setFormData] = useState({});
   const [fields, setFields] = useState([]);
+  
+  const textRefs = React.useRef({});
+
+  useEffect(() => {
+    // Keep text perfectly centered around the X coordinate as user types
+    Object.keys(textRefs.current).forEach(key => {
+      const node = textRefs.current[key];
+      if (node) {
+        node.offsetX(node.width() / 2);
+      }
+    });
+  }, [formData, fields]);
 
   useEffect(() => {
     fetchTemplateAndFields();
@@ -209,6 +221,7 @@ const Generate = () => {
                   {fields.map(field => (
                     <Text
                       key={field.field_name}
+                      ref={(node) => { textRefs.current[field.field_name] = node; }}
                       text={formData[field.field_name] || `[${field.field_name}]`}
                       x={field.x_coordinate}
                       y={field.y_coordinate}

@@ -44,7 +44,15 @@ const Configure = () => {
       trRef.current.nodes([textRefs.current[selectedId]]);
       trRef.current.getLayer().batchDraw();
     }
-  }, [selectedId]);
+    
+    // Auto-center all text nodes around their X coordinate
+    Object.keys(textRefs.current).forEach(key => {
+      const node = textRefs.current[key];
+      if (node) {
+        node.offsetX(node.width() / 2);
+      }
+    });
+  }, [selectedId, placeholders]);
 
   useEffect(() => {
     fetchTemplateAndPlaceholders();
