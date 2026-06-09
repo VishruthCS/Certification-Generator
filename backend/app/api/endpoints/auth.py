@@ -7,7 +7,7 @@ from app.core import security
 from app.core.config import settings
 from app.core.database import get_db
 from app.models.user import User
-from app.schemas.user import Token, UserCreate, UserResponse, GoogleToken, ForgotPasswordRequest, ResetPasswordRequest
+from app.schemas.user import Token, UserCreate, UserLogin, UserResponse, GoogleToken, ForgotPasswordRequest, ResetPasswordRequest
 from google.oauth2 import id_token
 from google.auth.transport import requests
 import secrets
@@ -51,7 +51,7 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)) -> Any:
         raise HTTPException(status_code=400, detail=f"Registration crash: {str(e)}")
 
 @router.post("/login", response_model=Token)
-def login(user_in: UserCreate, db: Session = Depends(get_db)) -> Any:
+def login(user_in: UserLogin, db: Session = Depends(get_db)) -> Any:
     user = db.query(User).filter(User.email == user_in.email).first()
     if not user or not security.verify_password(user_in.password, user.password_hash):
         raise HTTPException(status_code=400, detail="Incorrect email or password")

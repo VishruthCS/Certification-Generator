@@ -24,6 +24,10 @@ class UserCreate(UserBase):
             raise ValueError('Password must contain at least one special character')
         return v
 
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
 class ForgotPasswordRequest(BaseModel):
     email: EmailStr
 

@@ -26,7 +26,6 @@ const Login = () => {
     try {
       const response = await api.post("/auth/login", {
         email,
-        username: email.split("@")[0],
         password,
       });
       localStorage.setItem("token", response.data.access_token);
@@ -40,13 +39,15 @@ const Login = () => {
         });
         const loginResponse = await api.post("/auth/login", {
             email,
-            username: email.split("@")[0],
             password,
         });
         localStorage.setItem("token", loginResponse.data.access_token);
         navigate("/");
       } catch (regErr) {
-          const detail = regErr.response?.data?.detail || "Invalid credentials and auto-register failed.";
+          let detail = regErr.response?.data?.detail || "Invalid credentials and auto-register failed.";
+          if (Array.isArray(detail)) {
+              detail = detail.map(err => err.msg).join(", ");
+          }
           setError(detail);
       }
     }
@@ -161,7 +162,7 @@ const Login = () => {
                 shape="rectangular"
                 size="large"
                 text="continue_with"
-                width="100%"
+                width={400}
               />
             </Box>
 
