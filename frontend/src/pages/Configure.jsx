@@ -254,17 +254,17 @@ const Configure = () => {
           </Stage>
         </Box>
 
-        <Box sx={{ mt: 4, display: "flex", gap: 2, alignItems: "center" }}>
+        <Box sx={{ mt: 4, display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 2, alignItems: { xs: "stretch", md: "center" } }}>
           <Button variant="outlined" color="primary" onClick={autoDetectPlaceholders} disabled={analyzing}>
             {analyzing ? <CircularProgress size={24} /> : "Auto-Detect with AI"}
           </Button>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, ml: 2 }}>
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: { xs: "center", md: "flex-start" }, gap: 1 }}>
             <Typography variant="body2">Text Color:</Typography>
             <input 
               type="color" 
               value={fontColor} 
               onChange={(e) => setFontColor(e.target.value)} 
-              style={{ cursor: "pointer", height: "36px" }}
+              style={{ cursor: "pointer", height: "36px", width: "50px", border: "none", borderRadius: "4px" }}
             />
           </Box>
           <Button variant="outlined" color="success" onClick={() => {
@@ -272,14 +272,14 @@ const Configure = () => {
             if (name) {
               setPlaceholders({...placeholders, [name.replace(/\s+/g, '_').toLowerCase()]: { x: 100, y: 100, text: `[${name}]`, fontSize: 30 }});
             }
-          }} sx={{ ml: 2 }}>
+          }}>
             + Add Field
           </Button>
-          <Box sx={{ flexGrow: 1 }} />
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'block' } }} />
           <Button variant="contained" color="secondary" onClick={() => navigate("/")}>
             Cancel
           </Button>
-          <Button variant="contained" color="primary" onClick={saveConfiguration}>
+          <Button variant="contained" color="primary" onClick={saveConfiguration} sx={{ background: 'linear-gradient(45deg, #1976d2 0%, #9c27b0 100%)', fontWeight: 700 }}>
             Save Configuration
           </Button>
         </Box>
