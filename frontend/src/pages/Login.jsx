@@ -144,7 +144,7 @@ const Login = () => {
 
         {/* Right Login Section */}
         <Grid size={{ xs: 12, md: 6 }}>
-          <Paper elevation={0} sx={{ p: 6, width: "100%", bgcolor: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 4, boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.3)' }}>
+          <Paper elevation={0} sx={{ p: { xs: 3, sm: 4, md: 6 }, width: "100%", bgcolor: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 4, boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.3)' }}>
             <Typography component="h1" variant="h4" align="center" sx={{ fontWeight: 700, mb: 2 }}>
               Welcome Back
             </Typography>
@@ -162,6 +162,7 @@ const Login = () => {
                 shape="rectangular"
                 size="large"
                 text="continue_with"
+                width={280}
               />
             </Box>
 
