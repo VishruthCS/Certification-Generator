@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, Divider } from '@mui/material';
-import { Home as HomeIcon, CloudUpload as CloudUploadIcon } from '@mui/icons-material';
+import { Home as HomeIcon, CloudUpload as CloudUploadIcon, Logout as LogoutIcon } from '@mui/icons-material';
 import { useNavigate, Outlet, useLocation } from 'react-router-dom';
 
 const drawerWidth = 260;
@@ -64,6 +64,30 @@ const SidebarLayout = () => {
               </ListItem>
             );
           })}
+        </List>
+        <Box sx={{ flexGrow: 1 }} />
+        <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)' }} />
+        <List sx={{ mb: 2 }}>
+          <ListItem disablePadding sx={{ px: 2 }}>
+            <ListItemButton 
+              onClick={() => {
+                localStorage.removeItem("token");
+                navigate("/login");
+              }}
+              sx={{
+                borderRadius: 2,
+                color: '#ef5350',
+                '&:hover': {
+                  bgcolor: 'rgba(239, 83, 80, 0.1)',
+                }
+              }}
+            >
+              <ListItemIcon sx={{ color: 'inherit', minWidth: 40 }}>
+                <LogoutIcon />
+              </ListItemIcon>
+              <ListItemText primary="Logout" />
+            </ListItemButton>
+          </ListItem>
         </List>
       </Drawer>
 
